@@ -1,9 +1,10 @@
 package loadbalance;
 
+import java.rmi.Remote;
 import java.util.List;
 import java.util.UUID;
 
-public interface ILoadBalancer {
+public interface ILoadBalancer extends Remote {
 
   List<String> getAvailableSeats(String theatre);
 

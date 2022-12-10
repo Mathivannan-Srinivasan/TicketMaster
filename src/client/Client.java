@@ -39,6 +39,13 @@ public class Client implements IClient {
           System.out.println(
               "Enter the theatre you want to book tickets from: \n 1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
           String theatre = scanner.nextLine();
+          if (theatre.equals("1")) {
+            theatre = "AMC";
+          } else if (theatre.equals("2")) {
+            theatre = "REG";
+          } else if (theatre.equals("3")) {
+            theatre = "CIN";
+          }
           List<String> availableSeats = lb.getAvailableSeats(theatre);
           if (availableSeats.size() == 0) {
             System.out.println("Sorry tickets not available. Try another theatre");
@@ -55,6 +62,9 @@ public class Client implements IClient {
             System.out.println(
                 "Exceeded booking limit or chosen unavailable tickets. Please enter again.");
             seats = scanner.nextLine().split(" ");
+          }
+          for(int i=0;i<seats.length; i++) {
+            seats[i] = theatre + seats[i];
           }
           if (!lb.blockSeats(Arrays.asList(seats))) {
             System.out.println("Sorry the selected seats have been booked.");
