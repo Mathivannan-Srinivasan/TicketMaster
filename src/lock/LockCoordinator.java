@@ -27,7 +27,7 @@ public class LockCoordinator extends Coordinator<LockOperation> implements ILock
     }
 
     try {
-      LockCoordinator coordinator = new LockCoordinator("LockServers", serverPorts);
+      LockCoordinator coordinator = new LockCoordinator("LockServer", serverPorts);
       ILockCoordinator stub = (ILockCoordinator) UnicastRemoteObject.exportObject(coordinator, 0);
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
 
