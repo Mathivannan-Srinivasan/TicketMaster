@@ -137,7 +137,7 @@ public class DataStore implements IDataStore {
 
     try {
       Acceptor<DataOperation> acceptor = new Acceptor<DataOperation>(portAsString);
-      DataStore server = new DataStore(100, port, coordinatorPort, acceptor);
+      DataStore server = new DataStore(20, port, coordinatorPort, acceptor);
 
       IDataStore stub = (IDataStore) UnicastRemoteObject.exportObject(server, 0);
 
