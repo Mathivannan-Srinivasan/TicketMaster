@@ -10,9 +10,9 @@ public interface ILoadBalancer extends Remote {
 
   Boolean blockSeats(List<String> seats);
 
-  UUID bookTicket(String name, String email);
+  String bookTicket(String name, String email, List<String> seats);
 
-  List<String> getTicketDetails(UUID ticketNo);
+  List<String> getTicketDetails(String ticketNo);
 
-  Boolean deleteTicket(UUID ticketNo);
+  Boolean deleteTicket(String ticketNo);
 }

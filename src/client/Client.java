@@ -63,7 +63,7 @@ public class Client implements IClient {
                 "Exceeded booking limit or chosen unavailable tickets. Please enter again.");
             seats = scanner.nextLine().split(" ");
           }
-          for(int i=0;i<seats.length; i++) {
+          for (int i = 0; i < seats.length; i++) {
             seats[i] = theatre + seats[i];
           }
           if (!lb.blockSeats(Arrays.asList(seats))) {
@@ -74,7 +74,7 @@ public class Client implements IClient {
           String name = scanner.nextLine();
           System.out.println("\n Please enter your email id: ");
           String mailId = scanner.nextLine();
-          UUID ticketNum = lb.bookTicket(name, mailId);
+          String ticketNum = lb.bookTicket(name, mailId, Arrays.asList(seats));
           if (ticketNum == null) {
             System.out.println("Sorry transaction failed. Try again.");
             continue;
@@ -86,7 +86,7 @@ public class Client implements IClient {
         } else if (option.equalsIgnoreCase("2")) {
           System.out.println("Enter Ticket Number");
           String num = scanner.nextLine();
-          List<String> ticketDetails = lb.getTicketDetails(UUID.fromString(num));
+          List<String> ticketDetails = lb.getTicketDetails(num);
           if (ticketDetails != null) {
             System.out.println("Ticket Details:\n" + ticketDetails);
           } else {
@@ -95,7 +95,7 @@ public class Client implements IClient {
         } else if (option.equalsIgnoreCase("3")) {
           System.out.println("Enter Ticket Number");
           String num = scanner.nextLine();
-          if (lb.deleteTicket(UUID.fromString(num))) {
+          if (lb.deleteTicket(num)) {
             System.out.println("Ticket deleted successfully");
           } else {
             System.out.println("Sorry. Unable to cancel booking");

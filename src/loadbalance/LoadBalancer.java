@@ -6,7 +6,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import lock.ILockServer;
 
 public class LoadBalancer implements ILoadBalancer {
@@ -46,17 +45,17 @@ public class LoadBalancer implements ILoadBalancer {
   }
 
   @Override
-  public UUID bookTicket(String name, String email) {
+  public String bookTicket(String name, String email, List<String> seats) {
     return null;
   }
 
   @Override
-  public List<String> getTicketDetails(UUID ticketNo) {
+  public List<String> getTicketDetails(String ticketNo) {
     return null;
   }
 
   @Override
-  public Boolean deleteTicket(UUID ticketNo) {
+  public Boolean deleteTicket(String ticketNo) {
     return null;
   }
 
