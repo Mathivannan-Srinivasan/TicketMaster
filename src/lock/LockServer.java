@@ -7,7 +7,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lock.LockOperation.Operation;
+import lock.LockOperation.LockOperationType;
 import paxos.Acceptor;
 
 public class LockServer implements ILockServer {
@@ -29,7 +29,7 @@ public class LockServer implements ILockServer {
     try {
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
       ILockCoordinator coordinator = (ILockCoordinator) registry.lookup("LockCoordinator");
-      LockOperation operation = new LockOperation(Operation.PUT, seats);
+      LockOperation operation = new LockOperation(LockOperationType.PUT, seats);
       boolean isAccepted = coordinator.accept(operation);
       if(isAccepted) {
         keyValueStore.put(seats);
@@ -47,7 +47,7 @@ public class LockServer implements ILockServer {
     try {
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
       ILockCoordinator coordinator = (ILockCoordinator) registry.lookup("LockCoordinator");
-      LockOperation operation = new LockOperation(Operation.DELETE, seats);
+      LockOperation operation = new LockOperation(LockOperationType.DELETE, seats);
       boolean isAccepted = coordinator.accept(operation);
       if(isAccepted) {
         keyValueStore.delete(seats);

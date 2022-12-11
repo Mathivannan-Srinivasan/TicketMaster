@@ -5,18 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LockOperation implements Serializable {
-  public enum Operation implements Serializable {
+  public enum LockOperationType implements Serializable {
     NONE, PUT, DELETE
   }
-  public Operation operation;
+  public LockOperationType operation;
   public List<String> arguments;
 
   public LockOperation() {
-    operation = Operation.NONE;
+    operation = LockOperationType.NONE;
     arguments = new ArrayList<>();
   }
 
-  public LockOperation(Operation operation, List<String> arguments) {
+  public LockOperation(LockOperationType operation, List<String> arguments) {
     this.operation = operation;
     this.arguments = arguments;
   }
