@@ -5,8 +5,8 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface IDataStoreManager extends Remote {
-  List<String> getAvailableSeats(String city) throws RemoteException;
-  String bookSeats(String city, String name, String email, List<String> seats) throws RemoteException;
-  BookingDetails getBookingDetails(String city, String bookingId) throws RemoteException;
-  void deleteBooking(String city, String bookingId) throws RemoteException;
+  List<String> getAvailableSeats(String theatre) throws RemoteException;
+  String bookSeats(String theatre, String name, String email, List<String> seats) throws RemoteException;
+  BookingDetails getBookingDetails(String theatre, String bookingId) throws RemoteException;
+  void deleteBooking(String theatre, String bookingId) throws RemoteException;
 }

@@ -1,5 +1,6 @@
 package loadbalance;
 
+import datastore.IDataStoreManager;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -16,16 +17,15 @@ public class LoadBalancer implements ILoadBalancer {
   @Override
   public List<String> getAvailableSeats(String theatre) {
     Random random = new Random();
-    ILockServer server;
+    IDataStoreManager server;
     try {
       int num = random.nextInt(serverPorts.size());
       Registry reg = LocateRegistry.getRegistry(serverPorts.get(num));
-      server = (ILockServer) reg.lookup("LockServer" + num);
-      // return server.getAvailableSeats(theatre);
+      server = (IDataStoreManager) reg.lookup("DataStoreServer" + num);
+      return server.getAvailableSeats(theatre);
     } catch (Exception e) {
-
+      return null;
     }
-    return null;
   }
 
   @Override
