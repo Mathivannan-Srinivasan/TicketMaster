@@ -5,7 +5,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lock.LockOperation.LockOperationType;
@@ -23,6 +25,11 @@ public class LockServer implements ILockServer {
     this.acceptor = acceptor;
     this.coordinatorPort = coordinatorPort;
     this.keyValueStore = new KeyValueStore();
+  }
+
+  @Override
+  public Set<String> getCopy() throws RemoteException {
+    return keyValueStore.asCopy();
   }
 
   @Override
@@ -79,6 +86,19 @@ public class LockServer implements ILockServer {
     }
   }
 
+  private boolean recoverState(int replicaPort) {
+    try {
+      Registry registry = LocateRegistry.getRegistry(replicaPort);
+      ILockServer server = (ILockServer) registry.lookup("LockServer" + replicaPort);
+      this.keyValueStore.update(server.getCopy());
+      return true;
+    }
+    catch (Exception e) {
+      logger.log(Level.SEVERE, e.getMessage());
+    }
+    return false;
+  }
+
   public static void main(String[] args) {
     if(args.length < 1)
       throw new IllegalArgumentException("Port number missing");
@@ -88,9 +108,19 @@ public class LockServer implements ILockServer {
       throw new IllegalArgumentException("Coordinator Port number missing");
     int coordinatorPort = Integer.parseInt(args[1]);
 
+    List<Integer> recoveryPorts = new ArrayList<>();
+    for (int i = 2; i < args.length; i++) {
+      recoveryPorts.add(Integer.parseInt(args[i]));
+    }
+
     try {
       Acceptor<LockOperation> acceptor = new Acceptor<LockOperation>(portAsString);
       LockServer server = new LockServer(port, coordinatorPort, acceptor);
+
+      for(int recovery : recoveryPorts) {
+        if(server.recoverState(recovery))
+          break;
+      }
 
       ILockServer stub = (ILockServer) UnicastRemoteObject.exportObject(server, 0);
 

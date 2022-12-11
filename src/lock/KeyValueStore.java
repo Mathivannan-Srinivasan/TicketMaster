@@ -1,6 +1,7 @@
 package lock;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -44,5 +45,15 @@ public class KeyValueStore implements IKeyValueStore {
   @Override
   public void delete(List<String> keys) {
     keys.forEach(lockedSeats::remove);
+  }
+
+  @Override
+  public Set<String> asCopy() {
+    return new HashSet<>(lockedSeats);
+  }
+
+  @Override
+  public void update(Set<String> state) {
+    lockedSeats = state;
   }
 }

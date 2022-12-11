@@ -1,5 +1,6 @@
 package datastore;
 
+import com.sun.tools.javac.util.Pair;
 import datastore.DataOperation.DataOperationType;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -14,8 +15,8 @@ import paxos.Acceptor;
 
 public class DataStore implements IDataStore {
 
-  private final HashMap<String, Boolean> seats;
-  private final HashMap<String, BookingDetails> bookings;
+  private HashMap<String, Boolean> seats;
+  private HashMap<String, BookingDetails> bookings;
   private final int port;
   private final Acceptor<DataOperation> acceptor;
   private final int coordinatorPort;
@@ -30,6 +31,14 @@ public class DataStore implements IDataStore {
     this.port = port;
     this.acceptor = acceptor;
     this.coordinatorPort = coordinatorPort;
+  }
+
+  @Override
+  public Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> getCopy() throws RemoteException {
+    Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> state = new Pair<>(
+        new HashMap<>(seats), new HashMap<>(bookings)
+    );
+    return state;
   }
 
   @Override
@@ -126,6 +135,21 @@ public class DataStore implements IDataStore {
     }
   }
 
+  private boolean recoverState(int replicaPort) {
+    try {
+      Registry registry = LocateRegistry.getRegistry(replicaPort);
+      IDataStore server = (IDataStore) registry.lookup("DataStoreServer" + replicaPort);
+      Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> state = server.getCopy();
+      this.seats = state.fst;
+      this.bookings = state.snd;
+      return true;
+    }
+    catch (Exception e) {
+      logger.log(Level.SEVERE, e.getMessage());
+    }
+    return false;
+  }
+
   public static void main(String[] args) {
     if(args.length < 1)
       throw new IllegalArgumentException("Port number missing");
@@ -135,9 +159,19 @@ public class DataStore implements IDataStore {
       throw new IllegalArgumentException("Coordinator Port number missing");
     int coordinatorPort = Integer.parseInt(args[1]);
 
+    List<Integer> recoveryPorts = new ArrayList<>();
+    for (int i = 2; i < args.length; i++) {
+      recoveryPorts.add(Integer.parseInt(args[i]));
+    }
+
     try {
       Acceptor<DataOperation> acceptor = new Acceptor<DataOperation>(portAsString);
       DataStore server = new DataStore(20, port, coordinatorPort, acceptor);
+
+      for(int recovery : recoveryPorts) {
+        if(server.recoverState(recovery))
+          break;
+      }
 
       IDataStore stub = (IDataStore) UnicastRemoteObject.exportObject(server, 0);
 
