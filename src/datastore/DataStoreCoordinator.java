@@ -32,7 +32,7 @@ public class DataStoreCoordinator extends Coordinator<DataOperation> implements 
       IDataStoreCoordinator stub = (IDataStoreCoordinator) UnicastRemoteObject.exportObject(coordinator, 0);
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
 
-      registry.bind("DataStoreServerCoordinator", stub);
+      registry.bind("DataStoreServerCoordinator"+coordinatorPort, stub);
 
     } catch (Exception e) {
       logger.log(Level.SEVERE, "Unable to bind Data store Coordinator. " + e.getMessage());

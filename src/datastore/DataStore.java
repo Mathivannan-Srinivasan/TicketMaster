@@ -59,7 +59,7 @@ public class DataStore implements IDataStore {
   public String bookSeats(BookingDetails bookingDetails) throws RemoteException {
     try {
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
-      IDataStoreCoordinator coordinator = (IDataStoreCoordinator) registry.lookup("DataCoordinator");
+      IDataStoreCoordinator coordinator = (IDataStoreCoordinator) registry.lookup("DataCoordinator"+coordinatorPort);
       DataOperation operation = new DataOperation(DataOperationType.BOOK, bookingDetails);
       boolean isAccepted = coordinator.accept(operation);
       if(isAccepted) {
@@ -95,7 +95,7 @@ public class DataStore implements IDataStore {
     BookingDetails details = this.bookings.get(bookingId);
     try {
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
-      IDataStoreCoordinator coordinator = (IDataStoreCoordinator) registry.lookup("DataCoordinator");
+      IDataStoreCoordinator coordinator = (IDataStoreCoordinator) registry.lookup("DataCoordinator"+coordinatorPort);
       DataOperation operation = new DataOperation(DataOperationType.DELETE, details);
       boolean isAccepted = coordinator.accept(operation);
       if(isAccepted) {
