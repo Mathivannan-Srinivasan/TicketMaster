@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.UUID;
 import loadbalance.ILoadBalancer;
+import datastore.BookingDetails;
 
 public class Client implements IClient {
 
@@ -63,10 +63,7 @@ public class Client implements IClient {
                 "Exceeded booking limit or chosen unavailable tickets. Please enter again.");
             seats = scanner.nextLine().split(" ");
           }
-          for (int i = 0; i < seats.length; i++) {
-            seats[i] = theatre + seats[i];
-          }
-          if (!lb.blockSeats(Arrays.asList(seats))) {
+          if (!lb.blockSeats(theatre, Arrays.asList(seats))) {
             System.out.println("Sorry the selected seats have been booked.");
             continue;
           }
@@ -74,7 +71,7 @@ public class Client implements IClient {
           String name = scanner.nextLine();
           System.out.println("\n Please enter your email id: ");
           String mailId = scanner.nextLine();
-          String ticketNum = lb.bookTicket(name, mailId, Arrays.asList(seats));
+          String ticketNum = lb.bookTicket(name, mailId, theatre, Arrays.asList(seats));
           if (ticketNum == null) {
             System.out.println("Sorry transaction failed. Try again.");
             continue;
@@ -86,7 +83,9 @@ public class Client implements IClient {
         } else if (option.equalsIgnoreCase("2")) {
           System.out.println("Enter Ticket Number");
           String num = scanner.nextLine();
-          List<String> ticketDetails = lb.getTicketDetails(num);
+          System.out.println("Enter theatre");
+          String theatre = scanner.nextLine();
+          BookingDetails ticketDetails = lb.getTicketDetails(num, theatre);
           if (ticketDetails != null) {
             System.out.println("Ticket Details:\n" + ticketDetails);
           } else {
@@ -95,7 +94,9 @@ public class Client implements IClient {
         } else if (option.equalsIgnoreCase("3")) {
           System.out.println("Enter Ticket Number");
           String num = scanner.nextLine();
-          if (lb.deleteTicket(num)) {
+          System.out.println("Enter theatre");
+          String theatre = scanner.nextLine();
+          if (lb.deleteTicket(num, theatre)) {
             System.out.println("Ticket deleted successfully");
           } else {
             System.out.println("Sorry. Unable to cancel booking");
@@ -107,6 +108,7 @@ public class Client implements IClient {
         }
       } catch (Exception e) {
         System.out.println("Encounter Exception: " + e);
+        continue;
       }
     }
 

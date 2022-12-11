@@ -1,18 +1,18 @@
 package loadbalance;
 
+import datastore.BookingDetails;
 import java.rmi.Remote;
 import java.util.List;
-import java.util.UUID;
 
 public interface ILoadBalancer extends Remote {
 
   List<String> getAvailableSeats(String theatre);
 
-  Boolean blockSeats(List<String> seats);
+  Boolean blockSeats(String theatre, List<String> seats);
 
-  String bookTicket(String name, String email, List<String> seats);
+  String bookTicket(String name, String email, String theatre, List<String> seats);
 
-  List<String> getTicketDetails(String ticketNo);
+  BookingDetails getTicketDetails(String theatre, String ticketNo);
 
-  Boolean deleteTicket(String ticketNo);
+  Boolean deleteTicket(String theatre, String ticketNo);
 }

@@ -39,7 +39,7 @@ public class DataStoreManager implements IDataStoreManager {
   }
 
   @Override
-  public String bookSeats(String theatre, String name, String email, List<String> seats)
+  public String bookSeats(String name, String email, String theatre, List<String> seats)
       throws RemoteException {
     if(!theatreToServer.containsKey(theatre))
       throw new IllegalArgumentException("The given theatre is not supported yet");

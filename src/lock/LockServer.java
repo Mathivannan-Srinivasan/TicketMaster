@@ -1,5 +1,6 @@
 package lock;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -25,7 +26,7 @@ public class LockServer implements ILockServer {
   }
 
   @Override
-  public void lockSeats(List<String> seats) throws RemoteException {
+  public Boolean lockSeats(List<String> seats) throws RemoteException {
     try {
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
       ILockCoordinator coordinator = (ILockCoordinator) registry.lookup("LockCoordinator");
@@ -34,8 +35,9 @@ public class LockServer implements ILockServer {
       if(isAccepted) {
         keyValueStore.put(seats);
         coordinator.commit(port, operation);
+        return true;
       } else {
-        throw new IllegalArgumentException("Failed to reach consensus");
+        return false;
       }
     } catch (Exception e) {
       throw new IllegalArgumentException(e);

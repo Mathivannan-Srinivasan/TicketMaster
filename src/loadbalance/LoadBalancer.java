@@ -8,19 +8,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import lock.ILockServer;
+import datastore.BookingDetails;
 
 public class LoadBalancer implements ILoadBalancer {
 
-  private static ArrayList<Integer> serverPorts;
+  private static ArrayList<Integer> dataPorts;
+  private static ArrayList<Integer> lockPorts;
   private static int port;
+  private static Random random = new Random();
 
   @Override
   public List<String> getAvailableSeats(String theatre) {
-    Random random = new Random();
     IDataStoreManager server;
     try {
-      int num = random.nextInt(serverPorts.size());
-      Registry reg = LocateRegistry.getRegistry(serverPorts.get(num));
+      int num = random.nextInt(dataPorts.size());
+      Registry reg = LocateRegistry.getRegistry(dataPorts.get(num));
       server = (IDataStoreManager) reg.lookup("DataStoreServer" + num);
       return server.getAvailableSeats(theatre);
     } catch (Exception e) {
@@ -29,34 +31,73 @@ public class LoadBalancer implements ILoadBalancer {
   }
 
   @Override
-  public Boolean blockSeats(List<String> seats) {
+  public Boolean blockSeats(String theatre, List<String> seats) {
     Random random = new Random();
-    ILockServer server;
+    IDataStoreManager dataServer;
+    ILockServer lockServer;
     try {
-      int num = random.nextInt(serverPorts.size());
-      Registry reg = LocateRegistry.getRegistry(serverPorts.get(num));
-      server = (ILockServer) reg.lookup("LockServer" + num);
-      server.lockSeats(seats);
+      int dp = random.nextInt(dataPorts.size());
+      Registry reg = LocateRegistry.getRegistry(dataPorts.get(dp));
+      dataServer = (IDataStoreManager) reg.lookup("DataStoreServer" + dp);
+      List<String> availableSeats = dataServer.getAvailableSeats(theatre);
+      if (!availableSeats.containsAll(seats)) {
+        return false;
+      }
+      int lp = random.nextInt(lockPorts.size());
+      reg = LocateRegistry.getRegistry(dataPorts.get(lp));
+      lockServer = (ILockServer) reg.lookup("LockServer" + dp);
+      return lockServer.lockSeats(seats);
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  @Override
+  public String bookTicket(String name, String email, String theatre, List<String> seats) {
+    IDataStoreManager dataServer;
+    ILockServer lockServer;
+    int lp;
+    int dp;
+    try {
+      dp = random.nextInt(dataPorts.size());
+      Registry reg = LocateRegistry.getRegistry(dataPorts.get(dp));
+      dataServer = (IDataStoreManager) reg.lookup("DataStoreServer" + dp);
+      String ticketNum = dataServer.bookSeats(name, email, theatre, seats);
+      lp = random.nextInt(lockPorts.size());
+      reg = LocateRegistry.getRegistry(dataPorts.get(lp));
+      lockServer = (ILockServer) reg.lookup("LockServer" + dp);
+      lockServer.releaseLocks(seats);
+      return ticketNum;
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  @Override
+  public BookingDetails getTicketDetails(String theatre, String ticketNo) {
+    IDataStoreManager server;
+    try {
+      int num = random.nextInt(dataPorts.size());
+      Registry reg = LocateRegistry.getRegistry(dataPorts.get(num));
+      server = (IDataStoreManager) reg.lookup("DataStoreServer" + num);
+      return server.getBookingDetails(theatre, ticketNo);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  @Override
+  public Boolean deleteTicket(String theatre, String ticketNo) {
+    IDataStoreManager server;
+    try {
+      int num = random.nextInt(dataPorts.size());
+      Registry reg = LocateRegistry.getRegistry(dataPorts.get(num));
+      server = (IDataStoreManager) reg.lookup("DataStoreServer" + num);
+      server.deleteBooking(theatre, ticketNo);
       return true;
     } catch (Exception e) {
-
+      return null;
     }
-    return null;
-  }
-
-  @Override
-  public String bookTicket(String name, String email, List<String> seats) {
-    return null;
-  }
-
-  @Override
-  public List<String> getTicketDetails(String ticketNo) {
-    return null;
-  }
-
-  @Override
-  public Boolean deleteTicket(String ticketNo) {
-    return null;
   }
 
   public static void main(String[] args) {
@@ -66,7 +107,7 @@ public class LoadBalancer implements ILoadBalancer {
     }
     port = Integer.parseInt(args[0]);
     for (int i = 1; i < args.length; i++) {
-      serverPorts.add(Integer.parseInt(args[i]));
+      dataPorts.add(Integer.parseInt(args[i]));
     }
 
     ILoadBalancer loadBalancer;
