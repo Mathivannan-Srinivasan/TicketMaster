@@ -7,9 +7,15 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import lock.ILockServer;
 
 public class LoadBalancer implements ILoadBalancer {
@@ -99,4 +105,47 @@ public class LoadBalancer implements ILoadBalancer {
       System.exit(1);
     }
   }
+
+  private static class AESEncryption {
+
+    private static SecretKey key;
+
+    static {
+      try {
+        key = generateKey();
+      } catch (NoSuchAlgorithmException e) {
+        e.printStackTrace();
+      }
+    }
+
+    private static byte[] vector = generateVector();
+
+    private static byte[] encrypt(String plainText) throws Exception {
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+      IvParameterSpec ivParameterSpec = new IvParameterSpec(vector);
+      cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
+      return cipher.doFinal(plainText.getBytes());
+    }
+
+    private static String decrypt(byte[] cipherText) throws Exception {
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+      IvParameterSpec ivParameterSpec = new IvParameterSpec(vector);
+      cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
+      byte[] result = cipher.doFinal(cipherText);
+      return new String(result);
+    }
+
+    public static byte[] generateVector() {
+      byte[] vec = new byte[16];
+      new SecureRandom().nextBytes(vec);
+      return vec;
+    }
+
+    private static SecretKey generateKey() throws NoSuchAlgorithmException {
+      KeyGenerator aes = KeyGenerator.getInstance("AES");
+      aes.init(256, new SecureRandom());
+      return aes.generateKey();
+    }
+  }
+
 }
