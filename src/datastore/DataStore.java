@@ -1,6 +1,5 @@
 package datastore;
 
-import com.sun.tools.javac.util.Pair;
 import datastore.DataOperation.DataOperationType;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -33,13 +32,13 @@ public class DataStore implements IDataStore {
     this.coordinatorPort = coordinatorPort;
   }
 
-  @Override
-  public Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> getCopy() throws RemoteException {
-    Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> state = new Pair<>(
-        new HashMap<>(seats), new HashMap<>(bookings)
-    );
-    return state;
-  }
+//  @Override
+//  public Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> getCopy() throws RemoteException {
+//    Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> state = new Pair<>(
+//        new HashMap<>(seats), new HashMap<>(bookings)
+//    );
+//    return state;
+//  }
 
   @Override
   public List<String> getAvailableSeats() throws RemoteException {
@@ -68,7 +67,7 @@ public class DataStore implements IDataStore {
   public String bookSeats(BookingDetails bookingDetails) throws RemoteException {
     try {
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
-      IDataStoreCoordinator coordinator = (IDataStoreCoordinator) registry.lookup("DataCoordinator"+coordinatorPort);
+      IDataStoreCoordinator coordinator = (IDataStoreCoordinator) registry.lookup("DataStoreServerCoordinator"+coordinatorPort);
       DataOperation operation = new DataOperation(DataOperationType.BOOK, bookingDetails);
       boolean isAccepted = coordinator.accept(operation);
       if(isAccepted) {
@@ -135,20 +134,20 @@ public class DataStore implements IDataStore {
     }
   }
 
-  private boolean recoverState(int replicaPort) {
-    try {
-      Registry registry = LocateRegistry.getRegistry(replicaPort);
-      IDataStore server = (IDataStore) registry.lookup("DataStoreServer" + replicaPort);
-      Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> state = server.getCopy();
-      this.seats = state.fst;
-      this.bookings = state.snd;
-      return true;
-    }
-    catch (Exception e) {
-      logger.log(Level.SEVERE, e.getMessage());
-    }
-    return false;
-  }
+//  private boolean recoverState(int replicaPort) {
+//    try {
+//      Registry registry = LocateRegistry.getRegistry(replicaPort);
+//      IDataStore server = (IDataStore) registry.lookup("DataStoreServer" + replicaPort);
+//      Pair<HashMap<String, Boolean>, HashMap<String, BookingDetails>> state = server.getCopy();
+//      this.seats = state.fst;
+//      this.bookings = state.snd;
+//      return true;
+//    }
+//    catch (Exception e) {
+//      logger.log(Level.SEVERE, e.getMessage());
+//    }
+//    return false;
+//  }
 
   public static void main(String[] args) {
     if(args.length < 1)
@@ -168,13 +167,13 @@ public class DataStore implements IDataStore {
       Acceptor<DataOperation> acceptor = new Acceptor<DataOperation>(portAsString);
       DataStore server = new DataStore(20, port, coordinatorPort, acceptor);
 
-      for(int recovery : recoveryPorts) {
-        if(server.recoverState(recovery))
-          break;
-      }
+//      for(int recovery : recoveryPorts) {
+//        if(server.recoverState(recovery))
+//          break;
+//      }
 
       IDataStore stub = (IDataStore) UnicastRemoteObject.exportObject(server, 0);
-
+      LocateRegistry.createRegistry(port);
       Registry registry = LocateRegistry.getRegistry(port);
       registry.bind("DataStoreServer"+port, stub);
 

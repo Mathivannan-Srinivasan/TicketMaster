@@ -30,7 +30,7 @@ public class LockCoordinator extends Coordinator<LockOperation> implements ILock
       LockCoordinator coordinator = new LockCoordinator("LockServer", serverPorts);
       ILockCoordinator stub = (ILockCoordinator) UnicastRemoteObject.exportObject(coordinator, 0);
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
-
+      LocateRegistry.createRegistry(coordinatorPort);
       registry.bind("LockCoordinator", stub);
 
     } catch (Exception e) {

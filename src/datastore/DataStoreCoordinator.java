@@ -30,8 +30,8 @@ public class DataStoreCoordinator extends Coordinator<DataOperation> implements 
     try {
       DataStoreCoordinator coordinator = new DataStoreCoordinator("DataStoreServer", serverPorts);
       IDataStoreCoordinator stub = (IDataStoreCoordinator) UnicastRemoteObject.exportObject(coordinator, 0);
+      LocateRegistry.createRegistry(coordinatorPort);
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
-
       registry.bind("DataStoreServerCoordinator"+coordinatorPort, stub);
 
     } catch (Exception e) {

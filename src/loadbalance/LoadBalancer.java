@@ -96,13 +96,13 @@ public class LoadBalancer implements ILoadBalancer {
     Registry reg;
 
     try {
-      ILoadBalancer obj = new LoadBalancer();
-      loadBalancer = (LoadBalancer) UnicastRemoteObject.exportObject(obj, 0);
+      LoadBalancer obj = new LoadBalancer();
+      loadBalancer = (ILoadBalancer) UnicastRemoteObject.exportObject(obj, 0);
       LocateRegistry.createRegistry(port);
       reg = LocateRegistry.getRegistry(port);
       reg.bind("TicketMaster" + port, loadBalancer);
     } catch (Exception e) {
-      System.exit(1);
+      System.out.println(e.getMessage());
     }
   }
 

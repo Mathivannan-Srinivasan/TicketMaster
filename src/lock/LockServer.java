@@ -123,7 +123,7 @@ public class LockServer implements ILockServer {
       }
 
       ILockServer stub = (ILockServer) UnicastRemoteObject.exportObject(server, 0);
-
+      LocateRegistry.createRegistry(port);
       Registry registry = LocateRegistry.getRegistry(port);
       registry.bind("LockServer"+port, stub);
 

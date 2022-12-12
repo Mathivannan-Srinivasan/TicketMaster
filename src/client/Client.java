@@ -14,7 +14,7 @@ import datastore.BookingDetails;
 
 public class Client implements IClient {
 
-  private static ArrayList<Integer> serverPorts;
+  private static ArrayList<Integer> serverPorts = new ArrayList<>();
   private static Object List;
 
   public static void main(String args[]) {

@@ -90,10 +90,12 @@ public class DataStoreManager implements IDataStoreManager {
         Registry registry = LocateRegistry.getRegistry(serverPort);
         IDataStore server = (IDataStore) registry.lookup("DataStoreServer"+serverPort);
         manager.addServer(theatre, server);
+        ind += 1;
+        ind = ind % 3;
       }
 
       IDataStoreManager stub = (IDataStoreManager) UnicastRemoteObject.exportObject(manager, 0);
-
+      LocateRegistry.createRegistry(port);
       Registry registry = LocateRegistry.getRegistry(port);
       registry.bind("DataStoreManager"+port, stub);
 
