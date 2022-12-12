@@ -103,8 +103,8 @@ public class Client implements IClient {
           BookingDetails ticketDetails = lb.getTicketDetails(theatre, num);
           if (ticketDetails != null) {
             System.out.println(
-                "\nTicket Details:\n" + "\nName:" + ticketDetails.getName() + "\nEmail"
-                    + ticketDetails.getEmail() + "\nSeats" + ticketDetails.getSeats());
+                "\nTicket Details:\n" + "\nName:" + ticketDetails.getName() + "\nEmail: "
+                    + ticketDetails.getEmail() + "\nSeats: " + ticketDetails.getSeats());
           } else {
             System.out.println("Incorrect ticket number");
           }
@@ -141,7 +141,6 @@ public class Client implements IClient {
         }
       } catch (Exception e) {
         System.out.println("Encounter Exception: " + e);
-        continue;
       }
     }
 

@@ -86,14 +86,20 @@ public class LoadBalancer implements ILoadBalancer {
   }
 
   public static void main(String[] args) {
-    if (args.length != 3) {
-      System.out.println("Enter load balancer port.");
+    if (args.length < 5) {
+      System.out.println("Enter arguments in the format <Load Balancer Port> <No. of data ports> <Data Ports> <No. of lock ports> <Lock Ports>.");
       System.exit(1);
     }
+    int dp, lp;
     int port = Integer.parseInt(args[0]);
-    dataPorts.add(Integer.parseInt(args[1]));
-    lockPorts.add(Integer.parseInt(args[2]));
-
+    dp = Integer.parseInt(args[1]);
+    for(int i=0; i<dp; i++) {
+      dataPorts.add(Integer.parseInt(args[2+i]));
+    }
+    lp = Integer.parseInt(args[2+dp]);
+    for(int i=0; i<lp; i++) {
+      lockPorts.add(Integer.parseInt(args[3+dp+i]));
+    }
     ILoadBalancer loadBalancer;
     Registry reg;
 
