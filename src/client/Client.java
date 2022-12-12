@@ -33,11 +33,12 @@ public class Client implements IClient {
       try {
         Registry reg = LocateRegistry.getRegistry(port);
         ILoadBalancer lb = (ILoadBalancer) reg.lookup("TicketMaster" + port);
-        System.out.println("Enter option 1.Book Ticket 2.Get Ticket 3. Cancel Booking");
+        System.out.println(
+            "\nEnter option number: 1.Book Ticket 2.Get Ticket 3. Cancel Booking 4. Quit");
         String option = scanner.nextLine();
         if (option.equalsIgnoreCase("1")) {
           System.out.println(
-              "Enter the theatre you want to book tickets from: \n 1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
+              "\nEnter the theatre number you want to book tickets from: \n1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
           String theatre = scanner.nextLine();
           if (theatre.equals("1")) {
             theatre = "AMC";
@@ -45,18 +46,21 @@ public class Client implements IClient {
             theatre = "REG";
           } else if (theatre.equals("3")) {
             theatre = "CIN";
+          } else {
+            System.out.println("Invalid option. Please try again.");
+            continue;
           }
           List<String> availableSeats = lb.getAvailableSeats(theatre);
           if (availableSeats.size() == 0) {
             System.out.println("Sorry tickets not available. Try another theatre");
             continue;
           }
-          System.out.println("The available seats are: ");
+          System.out.print("The available seat numbers are: ");
           for (String seat : availableSeats) {
             System.out.print(seat + " ");
           }
           System.out.println(
-              "\nEnter the seats you want to book as space separated number: (Max 5)");
+              "\nEnter the seats number's you want to book as space separated number(Max 5): ");
           String[] seats = scanner.nextLine().split(" ");
           while (seats.length > 5 || !availableSeats.containsAll(Arrays.asList(seats))) {
             System.out.println(
@@ -67,9 +71,9 @@ public class Client implements IClient {
             System.out.println("Sorry the selected seats have been booked.");
             continue;
           }
-          System.out.println("\n Please enter your name: ");
+          System.out.println("\nPlease enter your name: ");
           String name = scanner.nextLine();
-          System.out.println("\n Please enter your email id: ");
+          System.out.println("\nPlease enter your email id: ");
           String mailId = scanner.nextLine();
           String ticketNum = lb.bookTicket(name, mailId, theatre, Arrays.asList(seats));
           if (ticketNum == null) {
@@ -77,14 +81,14 @@ public class Client implements IClient {
             continue;
           }
           System.out.println(
-              "Transaction Successful\n" + "Ticket Details are:\n" + "Name: " + name + "\nE-mail:"
-                  + mailId + "Ticket No:" + ticketNum);
+              "\nTransaction Successful\n" + "Ticket Details are:\n" + "Name: " + name + "\nE-mail:"
+                  + mailId + "\nTicket No:" + ticketNum);
 
         } else if (option.equalsIgnoreCase("2")) {
-          System.out.println("Enter Ticket Number");
+          System.out.println("\nEnter Ticket Number");
           String num = scanner.nextLine();
           System.out.println(
-              "Enter the theatre you want to delete tickets from: \n 1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
+              "\nEnter the theatre number you want to get tickets from: \n 1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
           String theatre = scanner.nextLine();
           if (theatre.equals("1")) {
             theatre = "AMC";
@@ -92,10 +96,15 @@ public class Client implements IClient {
             theatre = "REG";
           } else if (theatre.equals("3")) {
             theatre = "CIN";
+          } else {
+            System.out.println("Invalid option. Please try again.");
+            continue;
           }
-          BookingDetails ticketDetails = lb.getTicketDetails(num, theatre);
+          BookingDetails ticketDetails = lb.getTicketDetails(theatre, num);
           if (ticketDetails != null) {
-            System.out.println("Ticket Details:\n" + ticketDetails);
+            System.out.println(
+                "\nTicket Details:\n" + "\nName:" + ticketDetails.getName() + "\nEmail"
+                    + ticketDetails.getEmail() + "\nSeats" + ticketDetails.getSeats());
           } else {
             System.out.println("Incorrect ticket number");
           }
@@ -103,7 +112,7 @@ public class Client implements IClient {
           System.out.println("Enter Ticket Number");
           String num = scanner.nextLine();
           System.out.println(
-              "Enter the theatre you want to delete tickets from: \n 1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
+              "\nEnter the theatre number you want to delete tickets from: \n 1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
           String theatre = scanner.nextLine();
           if (theatre.equals("1")) {
             theatre = "AMC";
@@ -111,14 +120,22 @@ public class Client implements IClient {
             theatre = "REG";
           } else if (theatre.equals("3")) {
             theatre = "CIN";
-          }
-          if (lb.deleteTicket(num, theatre)) {
-            System.out.println("Ticket deleted successfully");
           } else {
-            System.out.println("Sorry. Unable to cancel booking");
+            System.out.println("Invalid option. Please try again.");
+            continue;
           }
+          if (lb.deleteTicket(theatre, num)) {
+            System.out.println("\nTicket deleted successfully");
+          } else {
+            System.out.println("\nSorry. Unable to cancel booking");
+          }
+        } else if (option.equalsIgnoreCase("4")) {
+          break;
+        } else {
+          System.out.println("Invalid option. Try again");
+          continue;
         }
-        System.out.println("Do you want to continue? (Yes / No)");
+        System.out.println("\nDo you want to continue? (Yes / No)");
         if (scanner.nextLine().equalsIgnoreCase("no")) {
           break;
         }

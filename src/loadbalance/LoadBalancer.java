@@ -39,6 +39,9 @@ public class LoadBalancer implements ILoadBalancer {
       return false;
     }
     ILockServer lockServer = getRandomLockServer();
+    for (int i = 0; i < seats.size(); i++) {
+      seats.set(i, theatre + seats.get(i));
+    }
     return lockServer.lockSeats(seats);
   }
 
@@ -48,6 +51,9 @@ public class LoadBalancer implements ILoadBalancer {
     IDataStoreManager dataServer = getRandomDataServer();
     String ticketNum = dataServer.bookSeats(name, email, theatre, seats);
     ILockServer lockServer = getRandomLockServer();
+    for (int i = 0; i < seats.size(); i++) {
+      seats.set(i, theatre + seats.get(i));
+    }
     lockServer.releaseLocks(seats);
     return ticketNum;
   }
@@ -73,10 +79,10 @@ public class LoadBalancer implements ILoadBalancer {
     return (IDataStoreManager) reg.lookup("DataStoreManager" + dataPorts.get(num));
   }
 
-  private ILockServer getRandomLockServer() throws RemoteException, NotBoundException{
-      int num = random.nextInt(lockPorts.size());
-      Registry reg = LocateRegistry.getRegistry(lockPorts.get(num));
-      return (ILockServer) reg.lookup("LockServer" + lockPorts.get(num));
+  private ILockServer getRandomLockServer() throws RemoteException, NotBoundException {
+    int num = random.nextInt(lockPorts.size());
+    Registry reg = LocateRegistry.getRegistry(lockPorts.get(num));
+    return (ILockServer) reg.lookup("LockServer" + lockPorts.get(num));
   }
 
   public static void main(String[] args) {
