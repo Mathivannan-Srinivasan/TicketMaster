@@ -3,7 +3,7 @@ package datastore;
 import java.io.Serializable;
 import lock.LockOperation.LockOperationType;
 
-public class DataOperation {
+public class DataOperation implements Serializable{
   public enum DataOperationType implements Serializable {
     NONE, BOOK, DELETE
   }

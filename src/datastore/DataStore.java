@@ -24,7 +24,7 @@ public class DataStore implements IDataStore {
   public DataStore(int totalSeats, int port, int coordinatorPort, Acceptor<DataOperation> acceptor) {
     this.seats = new HashMap<>();
     for (int i = 0; i < totalSeats; i++) {
-      this.seats.put(""+ i+1, false);
+      this.seats.put(""+ (i+1), false);
     }
     this.bookings = new HashMap<>();
     this.port = port;
@@ -103,7 +103,7 @@ public class DataStore implements IDataStore {
     BookingDetails details = this.bookings.get(bookingId);
     try {
       Registry registry = LocateRegistry.getRegistry(coordinatorPort);
-      IDataStoreCoordinator coordinator = (IDataStoreCoordinator) registry.lookup("DataCoordinator"+coordinatorPort);
+      IDataStoreCoordinator coordinator = (IDataStoreCoordinator) registry.lookup("DataStoreServerCoordinator"+coordinatorPort);
       DataOperation operation = new DataOperation(DataOperationType.DELETE, details);
       boolean isAccepted = coordinator.accept(operation);
       if(isAccepted) {

@@ -9,7 +9,7 @@ public class KeyValueStore implements IKeyValueStore {
   private Set<String> lockedSeats;
 
   public KeyValueStore() {
-    this.lockedSeats = Collections.emptySet();
+    this.lockedSeats = new HashSet<>();
   }
 
   @Override

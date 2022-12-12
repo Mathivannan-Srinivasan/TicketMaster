@@ -14,7 +14,7 @@ import lock.LockOperation.LockOperationType;
 import paxos.Acceptor;
 
 public class LockServer implements ILockServer {
-  private final IKeyValueStore keyValueStore;
+  private IKeyValueStore keyValueStore;
   private final int port;
   private final Acceptor<LockOperation> acceptor;
   private final int coordinatorPort;
@@ -39,9 +39,12 @@ public class LockServer implements ILockServer {
       ILockCoordinator coordinator = (ILockCoordinator) registry.lookup("LockCoordinator");
       LockOperation operation = new LockOperation(LockOperationType.PUT, seats);
       boolean isAccepted = coordinator.accept(operation);
+      logger.info("The lock seats operation is accepted by coordinator: " + isAccepted);
       if(isAccepted) {
         keyValueStore.put(seats);
+        logger.info("Updating current instance");
         coordinator.commit(port, operation);
+        logger.info("Updating other instances using coordinator");
         return true;
       } else {
         return false;

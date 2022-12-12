@@ -70,17 +70,13 @@ public class LoadBalancer implements ILoadBalancer {
   private IDataStoreManager getRandomDataServer() throws RemoteException, NotBoundException {
     int num = random.nextInt(dataPorts.size());
     Registry reg = LocateRegistry.getRegistry(dataPorts.get(num));
-    return (IDataStoreManager) reg.lookup("DataStoreServer" + num);
+    return (IDataStoreManager) reg.lookup("DataStoreManager" + dataPorts.get(num));
   }
 
-  private ILockServer getRandomLockServer() {
-    try {
-      int num = random.nextInt(dataPorts.size());
-      Registry reg = LocateRegistry.getRegistry(dataPorts.get(num));
-      return (ILockServer) reg.lookup("LockServer" + num);
-    } catch (Exception e) {
-      return null;
-    }
+  private ILockServer getRandomLockServer() throws RemoteException, NotBoundException{
+      int num = random.nextInt(lockPorts.size());
+      Registry reg = LocateRegistry.getRegistry(lockPorts.get(num));
+      return (ILockServer) reg.lookup("LockServer" + lockPorts.get(num));
   }
 
   public static void main(String[] args) {

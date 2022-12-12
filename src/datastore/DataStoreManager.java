@@ -32,8 +32,9 @@ public class DataStoreManager implements IDataStoreManager {
   @Override
   public List<String> getAvailableSeats(String theatre) throws RemoteException {
     if(!theatreToServer.containsKey(theatre))
-      throw new IllegalArgumentException("The given theatre is not supported yet");
+      throw new IllegalArgumentException("The given theatre is not supported yet" + theatre);
     List<IDataStore> servers = theatreToServer.get(theatre);
+
     int idx = rand.nextInt(servers.size());
     return servers.get(idx).getAvailableSeats();
   }
@@ -42,7 +43,7 @@ public class DataStoreManager implements IDataStoreManager {
   public String bookSeats(String name, String email, String theatre, List<String> seats)
       throws RemoteException {
     if(!theatreToServer.containsKey(theatre))
-      throw new IllegalArgumentException("The given theatre is not supported yet");
+      throw new IllegalArgumentException("The given theatre is not supported yet" + theatre);
     List<IDataStore> servers = theatreToServer.get(theatre);
     int idx = rand.nextInt(servers.size());
     String id = UUID.randomUUID().toString();
@@ -53,7 +54,7 @@ public class DataStoreManager implements IDataStoreManager {
   @Override
   public BookingDetails getBookingDetails(String theatre, String bookingId) throws RemoteException {
     if(!theatreToServer.containsKey(theatre))
-      throw new IllegalArgumentException("The given theatre is not supported yet");
+      throw new IllegalArgumentException("The given theatre is not supported yet" + theatre);
     List<IDataStore> servers = theatreToServer.get(theatre);
     int idx = rand.nextInt(servers.size());
     return servers.get(idx).getBookingDetails(bookingId);
@@ -62,7 +63,7 @@ public class DataStoreManager implements IDataStoreManager {
   @Override
   public void deleteBooking(String theatre, String bookingId) throws RemoteException {
     if(!theatreToServer.containsKey(theatre))
-      throw new IllegalArgumentException("The given theatre is not supported yet");
+      throw new IllegalArgumentException("The given theatre is not supported yet" + theatre);
     List<IDataStore> servers = theatreToServer.get(theatre);
     int idx = rand.nextInt(servers.size());
     servers.get(idx).deleteBooking(bookingId);

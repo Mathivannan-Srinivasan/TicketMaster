@@ -1,5 +1,6 @@
 package client;
 
+import datastore.BookingDetails;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.rmi.registry.LocateRegistry;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import loadbalance.ILoadBalancer;
-import datastore.BookingDetails;
 
 public class Client implements IClient {
 
@@ -83,8 +83,16 @@ public class Client implements IClient {
         } else if (option.equalsIgnoreCase("2")) {
           System.out.println("Enter Ticket Number");
           String num = scanner.nextLine();
-          System.out.println("Enter theatre");
+          System.out.println(
+              "Enter the theatre you want to delete tickets from: \n 1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
           String theatre = scanner.nextLine();
+          if (theatre.equals("1")) {
+            theatre = "AMC";
+          } else if (theatre.equals("2")) {
+            theatre = "REG";
+          } else if (theatre.equals("3")) {
+            theatre = "CIN";
+          }
           BookingDetails ticketDetails = lb.getTicketDetails(num, theatre);
           if (ticketDetails != null) {
             System.out.println("Ticket Details:\n" + ticketDetails);
@@ -94,8 +102,16 @@ public class Client implements IClient {
         } else if (option.equalsIgnoreCase("3")) {
           System.out.println("Enter Ticket Number");
           String num = scanner.nextLine();
-          System.out.println("Enter theatre");
+          System.out.println(
+              "Enter the theatre you want to delete tickets from: \n 1. AMC Cinemas 2. Regal Cinemas 3. Cinemark");
           String theatre = scanner.nextLine();
+          if (theatre.equals("1")) {
+            theatre = "AMC";
+          } else if (theatre.equals("2")) {
+            theatre = "REG";
+          } else if (theatre.equals("3")) {
+            theatre = "CIN";
+          }
           if (lb.deleteTicket(num, theatre)) {
             System.out.println("Ticket deleted successfully");
           } else {
